@@ -3,7 +3,7 @@
 Plugin Name: MP Stacks + Passwords
 Plugin URI: http://mintplugins.com
 Description: Password Protect any Stack or Brick in MP Stacks.
-Version: 1.0.0.0
+Version: 1.0.0.1
 Author: Mint Plugins
 Author URI: http://mintplugins.com
 Text Domain: mp_stacks_passwords
@@ -34,7 +34,7 @@ License: GPL2
 */
 // Plugin version
 if( !defined( 'MP_STACKS_PASSWORDS_VERSION' ) )
-	define( 'MP_STACKS_PASSWORDS_VERSION', '1.0.0.0' );
+	define( 'MP_STACKS_PASSWORDS_VERSION', '1.0.0.1' );
 
 // Plugin Folder URL
 if( !defined( 'MP_STACKS_PASSWORDS_PLUGIN_URL' ) )

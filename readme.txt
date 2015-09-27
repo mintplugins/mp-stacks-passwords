@@ -33,5 +33,11 @@ See full instructions at http://mintplugins.com/doc/mp-stacks
 
 == Changelog ==
 
+= 1.0.0.1 = September 27, 2015
+* Documentation Improvements.
+* Better, cleaner variable usage in js.
+* Changed "post-id" attr for pw form to "mp-brick-id".
+* Make sure mp-stacks-passwords.js is enqueued if Stack is password protected. Previously just Bricks made it enqueue.
+
 = 1.0.0.0 = September 21, 2015
 * Original release
