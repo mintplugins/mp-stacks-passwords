@@ -109,6 +109,9 @@ function mp_stacks_single_stack_password_output( $stack_html_output, $stack_id )
 	//If this Stack is password protected
 	else{
 		
+		//Enqueue Scripts
+		wp_enqueue_script( 'mp-stacks-passwords_js', plugins_url( '/js/mp-stacks-passwords.js', dirname( __FILE__ ) ), array( 'jquery' ), MP_STACKS_PASSWORDS_VERSION, true );
+		
 		//Output a password dialog
 		$content_output = '<div id="mp_stack_' . $stack_id . '" class="mp-stack">';
 			$content_output .= '<div class="mp-stacks-passwords-container">';
@@ -120,7 +123,7 @@ function mp_stacks_single_stack_password_output( $stack_html_output, $stack_id )
 					
 					<div class="message-text" style="font-size: 20px; color:#fff; margin-bottom:15px;"><?php echo apply_filters( 'mp_stacks_password_message', __( 'This content is locked', 'mp_stacks_passwords' ), $stack_id ); ?></div>
 					
-					<form class="mp-stacks-passwords-form" method="POST" stack-id="<?php echo $stack_id; ?>" style="width:100%; max-width:280px; display: inline-block;">
+					<form class="mp-stacks-passwords-form" method="POST" mp-stack-id="<?php echo $stack_id; ?>" style="width:100%; max-width:280px; display: inline-block;">
 						<input class="mp-stacks-password" name="mp-stacks-password" placeholder="<?php echo __( 'Enter Password...', 'mp_stacks_passwords' ); ?>" type="password" style="display:inline-block; width:100%; max-width:280px; overflow:hidden; text-align:center;" />          
 						<input type="submit" class="button" value="<?php echo __( 'Unlock', 'mp_stacks_passwords' ); ?>" style="display:inline-block; width:100%; max-width:280px; overflow:hidden; margin-top:10px;"/>
 					</form>
