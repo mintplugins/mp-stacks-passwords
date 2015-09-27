@@ -1,10 +1,10 @@
 <?php 
 /**
- * This file contains the ajax callback functions involved in the mp stacks + sermongrid
+ * This file contains the ajax callback functions involved in the mp stacks + passwords
  *
  * @since 1.0.0
  *
- * @package    MP Stacks Features
+ * @package    MP Stacks Passwords
  * @subpackage Functions
  *
  * @copyright  Copyright (c) 2015, Mint Plugins
