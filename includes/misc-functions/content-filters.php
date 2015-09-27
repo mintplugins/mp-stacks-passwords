@@ -126,7 +126,7 @@ function mp_stacks_brick_content_output_passwords($default_content_output, $mp_s
 				
 				<div class="message-text" style="font-size: 20px; color:#fff; margin-bottom:15px;"><?php echo apply_filters( 'mp_stacks_password_message', __( 'This content is locked', 'mp_stacks_passwords' ), $post_id ); ?></div>
 				
-                <form class="mp-stacks-passwords-form" method="POST" post-id="<?php echo $post_id; ?>">
+                <form class="mp-stacks-passwords-form" method="POST" mp-brick-id="<?php echo $post_id; ?>">
                     <input class="mp-stacks-password" name="mp-stacks-password" placeholder="<?php echo __( 'Enter Password...', 'mp_stacks_passwords' ); ?>" type="password" style="display:inline-block; width:85%; overflow:hidden; text-align:center;" />          
                     <input type="submit" class="button" value="<?php echo __( 'Unlock', 'mp_stacks_passwords' ); ?>" style="display:inline-block; width:85%; overflow:hidden; margin-top:10px;"/>
 				</form>
