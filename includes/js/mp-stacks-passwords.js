@@ -4,11 +4,11 @@ jQuery( document ).ready( function( $ ){
 		
 		event.preventDefault();
 		
-		var brick_id = $(this).attr( 'post-id' );
-		var stack_id = $(this).attr( 'stack-id' );
-		var this_brick_css_string = $(this).attr( 'post-id' ) ? '#mp-brick-css-' + $(this).attr( 'post-id' ) : null;
-		var this_brick_string = $(this).attr( 'post-id' ) ? '#mp-brick-' + $(this).attr( 'post-id' ) : null;
-		var this_stack_string = $(this).attr( 'stack-id' ) ? '#mp_stack_' + $(this).attr( 'stack-id' ) : null;
+		var brick_id = $(this).attr( 'mp-brick-id' ) ? $(this).attr( 'mp-brick-id' ) : false;
+		var stack_id = $(this).attr( 'mp-stack-id' ) ? $(this).attr( 'mp-stack-id' ) : false;
+		var this_brick_css_string = brick_id ? '#mp-brick-css-' + brick_id : null;
+		var this_brick_string = brick_id ? '#mp-brick-' + brick_id : null;
+		var this_stack_string = stack_id ? '#mp_stack_' + stack_id : null;
 		
 		console.log(this_stack_string);
 		
@@ -16,8 +16,8 @@ jQuery( document ).ready( function( $ ){
 		var postData = {
 			action: 'mp_stacks_passwords_unlock',
 			mp_stacks_password: $(this).find('.mp-stacks-password').val(),
-			mp_stacks_passwords_post_id: $(this).attr( 'post-id' ) ? $(this).attr( 'post-id' ) : false,
-			mp_stacks_passwords_stack_id: $(this).attr( 'stack-id' ) ? $(this).attr( 'stack-id' ) : false,	
+			mp_stacks_passwords_post_id: brick_id,
+			mp_stacks_passwords_stack_id: stack_id,	
 			mp_stacks_queried_object_id: $('body').attr('class').match(/\bmp-stacks-queried-object-id-(\d+)\b/)[1]
 		}
 		
