@@ -13,13 +13,77 @@
  */
 
 /**
- * This function hooks to the brick output. If it is supposed to be a 'feature', then it will output the passwords
+ * If a password is not valid or entered for a Brick that has a password required, return false. 
+ * This will make it so that a Brick's Content Types don't get run when the mp_brick function is called.
+ *
+ * @access   public
+ * @since    1.0.0
+ * @param    bool $execute_content_types_in_brick
+ * @param    int  $post_id The id of the Brick in question.
+ * @return   bool False if Content-Types shouldn't be executed. True if they should.
+ */
+function mp_stacks_passwords_maybe_disable_content_types( $execute_content_types_in_brick, $post_id ){
+	
+	//Get Passwords Metabox Repeater Array
+	$password_protection = mp_core_get_post_meta($post_id, 'mp_stacks_brick_passwords_on', false);
+	
+	//If this brick is not Password Protected, return true
+	if ( !$password_protection ){
+		return true;
+	}
+	else{
+		
+		//Check if the password is being passed via ajax at this moment
+		if ( 
+			(isset( $_POST['mp_stacks_password'] ) && isset( $_POST['mp_stacks_passwords_post_id'] ) )
+			||
+			(isset( $_SESSION['mp_stacks_password'] ) && isset( $_SESSION['mp_stacks_passwords_post_id'] ) )
+		){
+			
+			if( isset( $_POST['mp_stacks_password'] ) ){
+				$entered_password = $_SESSION['mp_stacks_password'] = sanitize_text_field( $_POST['mp_stacks_password'] );
+				$password_brick_id = $_SESSION['mp_stacks_passwords_post_id'] = sanitize_text_field( $_POST['mp_stacks_passwords_post_id'] );
+			}
+			elseif( isset( $_SESSION['mp_stacks_password'] ) ){
+				$entered_password = sanitize_text_field( $_SESSION['mp_stacks_password'] );
+				$password_brick_id = sanitize_text_field( $_SESSION['mp_stacks_passwords_post_id'] );
+			}
+			
+			//If the password was entered for this brick
+			if ( $password_brick_id == $post_id ){
+				
+				//Get this list of password that will unlock this brick
+				$brick_passwords = explode( ',', str_replace( ' ', '', mp_core_get_post_meta( $post_id, 'mp_stacks_brick_passwords' ) ) );	
+				
+				//If our user's entered password matches any of the passwords allowed for this brick
+				if ( in_array( $entered_password, $brick_passwords ) ){
+					
+					//The ajax-entered password is correct
+					return true;
+						
+				}
+				else{
+					return false;	
+				}
+			}
+		}
+		else{
+			return false;	
+		}
+			
+	}	
+		
+}
+add_filter( 'mp_stacks_execute_content_types_in_brick', 'mp_stacks_passwords_maybe_disable_content_types', 10, 2 );
+
+/**
+ * This function hooks to the brick output. If it is supposed to be password protected, then it will output the passwords
  *
  * @access   public
  * @since    1.0.0
  * @return   void
  */
-function mp_stacks_brick_content_output_passwords($default_content_output, $mp_stacks_content_type, $post_id){
+function mp_stacks_brick_content_output_passwords( $default_content_output, $mp_stacks_content_type, $post_id ){
 	
 	//Set the password flag so we know whether this is Content Type 1 or 2
 	global $mp_stacks_password_flags;
@@ -144,4 +208,4 @@ function mp_stacks_brick_content_output_passwords($default_content_output, $mp_s
 	}
 	
 }
-add_filter('mp_stacks_brick_content_output', 'mp_stacks_brick_content_output_passwords', 99, 3);
+add_filter('mp_stacks_brick_non_content_output', 'mp_stacks_brick_content_output_passwords', 99, 3);
