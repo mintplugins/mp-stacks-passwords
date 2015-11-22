@@ -4,7 +4,7 @@ Donate link: http://mintplugins.com/
 Tags: page, builder, stacks, bricks
 Requires at least: 3.5
 Tested up to: 4.3
-Stable tag: 1.0.0.0
+Stable tag: 1.0.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,6 +32,11 @@ See full instructions at http://mintplugins.com/doc/mp-stacks
 
 
 == Changelog ==
+
+= 1.0.0.2 = November 22, 2015
+* Change to use MP Stacks Ajax Functions for Ajax Brick refreshing added in MP Stacks 1.0.4.4.
+* Make sure to set the flag for "mp_stacks_execute_content_types_in_brick" to false so that Brick COntent Types dont get executed.
+* Make sure to set the mp_stacks_execute_mp_brick_in_mp_stack to false before the passwords are entered so that Brick Content Types aren't executed before a password is entered for the FULL stack.
 
 = 1.0.0.1 = September 27, 2015
 * Documentation Improvements.
