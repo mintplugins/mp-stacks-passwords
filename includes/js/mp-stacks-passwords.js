@@ -1,7 +1,7 @@
 jQuery( document ).ready( function( $ ){
 					
 	$( '.mp-stacks-passwords-container .mp-stacks-passwords-form' ).on( 'submit', function( event ){
-		
+				
 		event.preventDefault();
 		
 		var brick_id = $(this).attr( 'mp-brick-id' ) ? $(this).attr( 'mp-brick-id' ) : false;
@@ -10,7 +10,7 @@ jQuery( document ).ready( function( $ ){
 		var this_brick_string = brick_id ? '#mp-brick-' + brick_id : null;
 		var this_stack_string = stack_id ? '#mp_stack_' + stack_id : null;
 		
-		console.log(this_stack_string);
+		//console.log(this_stack_string);
 		
 		// Use ajax to check the password
 		var postData = {
@@ -21,63 +21,49 @@ jQuery( document ).ready( function( $ ){
 			mp_stacks_queried_object_id: $('body').attr('class').match(/\bmp-stacks-queried-object-id-(\d+)\b/)[1]
 		}
 		
-		//Ajax load more posts
+		//Load the bricks that are now unlocked.
 		$.ajax({
 			type: "POST",
 			data: postData,
 			dataType:"json",
 			url: mp_stacks_frontend_vars.ajaxurl,
-			success: function (response) {
-				
-				//If the password was successfully entered
-				if ( response.success ){
-					
-					//Put the Brick's CSS into the <head> of this document
-					if ( response.brick_css ){
-						
-						$( this_brick_css_string ).replaceWith( response.brick_css );	
+			success: function (ajax_response) {
 							
-					}
+				//If the password was successfully entered
+				if ( ajax_response.success ){
 					
-					//Replace the Brick's HTML 
-					if ( response.brick_html ){
-						$( this_brick_string ).replaceWith( response.brick_html );
+					//Re-Load the unlocked, password protected brick
+					if ( ajax_response.brick_css && ajax_response.brick_html){
+					
+						mp_stacks_load_ajax_brick( ajax_response, brick_id, false, false );
 						
-						//jQuery Trigger which Add-Ons can use to update themselves when a Brick is updated.
-						$( document ).trigger( 'mp_stacks_brick_loaded_via_ajax', [brick_id] );
 					}
 					
-					//Put the Stack's CSS into the <head> of this document
-					if ( response.stack_css ){
-						$( 'head' ).append( response.stack_css );
+					//Re-Load the unlocked, password protected stack
+					if ( ajax_response.stack_css ){
+												
+						mp_stacks_load_ajax_stack( ajax_response, stack_id, false, false );
 					}
 					
-					//Replace the Stack's HTML 
-					if ( response.stack_html ){
-						$( this_stack_string ).replaceWith( response.stack_html );
-						
-						//jQuery Trigger which Add-Ons can use to update themselves when a Brick is updated.
-						$( document ).trigger( 'mp_stacks_stack_loaded_via_ajax', [stack_id] );
-					}
 					
 				}
 				//If the password was incorrect
 				else{
 					
-					if ( response.error ){
+					if ( ajax_response.error ){
 						//Tell the user their password was wrong
 						if ( this_brick_string ){
-							$( this_brick_string +' .message-text' ).html( response.error_message );
+							$( this_brick_string +' .message-text' ).html( ajax_response.error_message );
 							$( this_brick_string +' .mp-stacks-password' ).val( '' );
 						}
 						if ( this_stack_string ){
-							$( this_stack_string +' .message-text' ).html( response.error_message );
+							$( this_stack_string +' .message-text' ).html( ajax_response.error_message );
 							$( this_stack_string +' .mp-stacks-password' ).val( '' );
 						}
 					}
 					else{
 						console.log( 'Incorrect Formatting in response from Ajax Function' );
-						console.log(response);
+						console.log(ajax_response);
 					}
 				
 				}
