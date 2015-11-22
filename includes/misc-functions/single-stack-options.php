@@ -65,9 +65,93 @@ add_action( 'mp_stacks_update_stack_options', 'mp_stacks_single_stack_password_s
  * @return   $stack_html_output String | If password protected, it is a password dialog. If not, it is a normal Stack's HTML output.
  */
 function mp_stacks_single_stack_password_output( $stack_html_output, $stack_id ){
+		
+	//Check if the ajax-entered password is correct.
+	if ( mp_stacks_passwords_check_stack_password( $stack_id ) ){
+		
+		//The ajax-entered password is correct, move on to the normal Stack Output - unlocked now.
+		return $stack_html_output;
+	}
 	
-	//Check if this Stack is supposed to be password protected
+	//If we had the wrong password or no password has been entered...
+				
+	//Enqueue Scripts
+	wp_enqueue_script( 'mp-stacks-passwords_js', plugins_url( '/js/mp-stacks-passwords.js', dirname( __FILE__ ) ), array( 'jquery' ), MP_STACKS_PASSWORDS_VERSION, true );
+	
+	//Output a password dialog
+	$content_output = '<div id="mp_stack_' . $stack_id . '" class="mp-stack">';
+		$content_output .= '<div class="mp-stacks-passwords-container">';
+			
+			ob_start();
+			
+			?>
+			<div class="mp-stacks-password-login" style="background-color:rgba(0, 0, 0, 0.58); width:100%; margin: 0 auto; padding:150px 20px 150px 20px; box-sizing:border-box; text-align:center;">
+				
+				<div class="message-text" style="font-size: 20px; color:#fff; margin-bottom:15px;"><?php echo apply_filters( 'mp_stacks_password_message', __( 'This content is locked', 'mp_stacks_passwords' ), $stack_id ); ?></div>
+				
+				<form class="mp-stacks-passwords-form" method="POST" mp-stack-id="<?php echo $stack_id; ?>" style="width:100%; max-width:280px; display: inline-block;">
+					<input class="mp-stacks-password" name="mp-stacks-password" placeholder="<?php echo __( 'Enter Password...', 'mp_stacks_passwords' ); ?>" type="password" style="display:inline-block; width:100%; max-width:280px; overflow:hidden; text-align:center;" />          
+					<input type="submit" class="button" value="<?php echo __( 'Unlock', 'mp_stacks_passwords' ); ?>" style="display:inline-block; width:100%; max-width:280px; overflow:hidden; margin-top:10px;"/>
+				</form>
+				
+			</div>
+			
+			<?php
+			
+			$content_output .= ob_get_clean();
+			
+		$content_output .= '</div>';
+	$content_output .= '</div>';
+	
+	return $content_output;
+		
+}
+add_filter( 'mp_stacks_html_output', 'mp_stacks_single_stack_password_output', 10, 2 );
+
+/**
+ * This function hooks to a filter which tells the MP Stack function whether to execute the mp_brick function for each brick in the stack or whether to skip it. 
+ * Here, we want to check if a password is valid before we execute any brick functions so that no enqueue scripts are output prior to the Stack password being entered correctly.
+ *
+ * @since    1.0.0
+ * @link     http://mintplugins.com/doc/
+ * @see      function_name()
+ * @param    bool $run_mp_brick_functions True if mp_brick functions should be executed. False if not.
+ * @param    int $stack_id The Id of the Stack in question.
+ * @return   bool $run_mp_brick_functions True if mp_brick functions should be executed. False if not.
+ */
+function mp_stacks_passwords_kill_brick_execution_if_stack_password_protected( $run_mp_brick_functions, $stack_id ){
+	
+	$stack_password_valid = mp_stacks_passwords_check_stack_password( $stack_id );
+	
+	if ( $stack_password_valid ){
+		return true;
+	}
+	else{
+		return false;
+	}
+	
+}
+add_filter( 'mp_stacks_execute_mp_brick_in_mp_stack', 'mp_stacks_passwords_kill_brick_execution_if_stack_password_protected', 10, 2 );
+
+/**
+ * This function checks whether a password in the $_POST var exists and whether it is valid for a Stack.
+ *
+ * @since    1.0.0
+ * @link     http://mintplugins.com/doc/
+ * @see      function_name()
+ * @param    int $stack_id The Id of the Stack in question.
+ * @return   bool True if the password is valid or no password is needed. False if password is invalid.
+ */
+function mp_stacks_passwords_check_stack_password( $stack_id ){
+	
 	$mp_stacks_single_stack_passwords = get_option( 'mp_stacks_stack_' . $stack_id . '_passwords' );
+	$mp_stacks_single_stack_passwords = !empty( $mp_stacks_single_stack_passwords ) ? $mp_stacks_single_stack_passwords : NULL;
+	
+	//If this Stack is not password protected
+	if ( empty( $mp_stacks_single_stack_passwords ) ){
+		//Show the Stack normally.
+		return true;
+	}
 	
 	//Check if the password is being passed via ajax at this moment
 	if ( 
@@ -94,52 +178,16 @@ function mp_stacks_single_stack_password_output( $stack_html_output, $stack_id )
 			//If our user's entered password matches any of the passwords allowed for this brick
 			if ( in_array( $entered_password, $stack_passwords ) ){
 				
-				//The ajax-enetered password is correct, move on to the normal Stack Output - unlocked now.
-				return $stack_html_output;
+				//The ajax-enetered password is correct, return true
+				return true;
 					
+			}
+			else{
+				return false;
 			}
 		}
 	}
-		
-	//If this Stack is not password protected
-	if ( empty( $mp_stacks_single_stack_passwords ) ){
-		//Show the Stack normally.
-		return $stack_html_output;
-	}
-	//If this Stack is password protected
 	else{
-		
-		//Enqueue Scripts
-		wp_enqueue_script( 'mp-stacks-passwords_js', plugins_url( '/js/mp-stacks-passwords.js', dirname( __FILE__ ) ), array( 'jquery' ), MP_STACKS_PASSWORDS_VERSION, true );
-		
-		//Output a password dialog
-		$content_output = '<div id="mp_stack_' . $stack_id . '" class="mp-stack">';
-			$content_output .= '<div class="mp-stacks-passwords-container">';
-				
-				ob_start();
-				
-				?>
-				<div class="mp-stacks-password-login" style="background-color:rgba(0, 0, 0, 0.58); width:100%; margin: 0 auto; padding:150px 20px 150px 20px; box-sizing:border-box; text-align:center;">
-					
-					<div class="message-text" style="font-size: 20px; color:#fff; margin-bottom:15px;"><?php echo apply_filters( 'mp_stacks_password_message', __( 'This content is locked', 'mp_stacks_passwords' ), $stack_id ); ?></div>
-					
-					<form class="mp-stacks-passwords-form" method="POST" mp-stack-id="<?php echo $stack_id; ?>" style="width:100%; max-width:280px; display: inline-block;">
-						<input class="mp-stacks-password" name="mp-stacks-password" placeholder="<?php echo __( 'Enter Password...', 'mp_stacks_passwords' ); ?>" type="password" style="display:inline-block; width:100%; max-width:280px; overflow:hidden; text-align:center;" />          
-						<input type="submit" class="button" value="<?php echo __( 'Unlock', 'mp_stacks_passwords' ); ?>" style="display:inline-block; width:100%; max-width:280px; overflow:hidden; margin-top:10px;"/>
-					</form>
-					
-				</div>
-				
-				<?php
-				
-				$content_output .= ob_get_clean();
-				
-			$content_output .= '</div>';
-		$content_output .= '</div>';
-		
-		return $content_output;
-		
+		return false;	
 	}
-
 }
-add_filter( 'mp_stacks_html_output', 'mp_stacks_single_stack_password_output', 10, 2 );
