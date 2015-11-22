@@ -13,7 +13,7 @@
  */
 
 /**
- * This function checks a password enetered via ajax and returns brick content if correct.
+ * This function checks a password entered via ajax and returns brick content if correct.
  *
  * @since    1.0.0
  * @link     
@@ -37,12 +37,8 @@ function mp_stacks_passwords_unlock_ajax(){
 		//If our user's entered password matches any of the passwords allowed for this brick
 		if ( in_array( $entered_password, $brick_passwords ) ){
 			
-			$return_array['success'] = true;
-			$return_array['brick_css'] = '<style type="text/css">' . mp_brick_css( $brick_id ) . '</style>';
-			$return_array['brick_html'] = mp_brick( $brick_id );
-			
-			echo json_encode( $return_array );
-			die();
+			//Create the output for the Brick Ajax
+			mp_stacks_brick_ajax( $_POST['mp_stacks_passwords_post_id'] );
 				
 		}
 		//If the password is incorrect
@@ -66,12 +62,8 @@ function mp_stacks_passwords_unlock_ajax(){
 		//If our user's entered password matches any of the passwords allowed for this brick
 		if ( in_array( $entered_password, $mp_stacks_single_stack_passwords ) ){
 		
-			$return_array['success'] = true;
-			$return_array['stack_css'] = '<style type="text/css">' . mp_stack_css( $stack_id ) . '</style>';
-			$return_array['stack_html'] = mp_stack( $stack_id );
-			
-			echo json_encode( $return_array );
-			die();
+			//Create the output for the Stack Ajax
+			mp_stacks_stack_ajax( $_POST['mp_stacks_passwords_stack_id'] );
 				
 		}
 		//If the password is incorrect
